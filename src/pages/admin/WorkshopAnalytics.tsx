@@ -38,51 +38,47 @@ const WorkshopAnalytics: React.FC = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2, height: 400 }}>
-            <Typography variant="h6" gutterBottom>
-              Workshop Attendance
-            </Typography>
-            <ResponsiveContainer width="100%" height="90%">
-              <BarChart data={attendanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="attendance" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+        <Paper elevation={3} sx={{ p: 2, height: 400 }}>
+          <Typography variant="h6" gutterBottom>
+            Workshop Attendance
+          </Typography>
+          <ResponsiveContainer width="100%" height="90%">
+            <BarChart data={attendanceData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="attendance" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Paper>
 
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2, height: 400 }}>
-            <Typography variant="h6" gutterBottom>
-              Revenue by Workshop
-            </Typography>
-            <ResponsiveContainer width="100%" height="90%">
-              <PieChart>
-                <Pie
-                  data={revenueData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="revenue"
-                  nameKey="name"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {revenueData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+        <Paper elevation={3} sx={{ p: 2, height: 400 }}>
+          <Typography variant="h6" gutterBottom>
+            Revenue by Workshop
+          </Typography>
+          <ResponsiveContainer width="100%" height="90%">
+            <PieChart>
+              <Pie
+                data={revenueData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="revenue"
+                nameKey="name"
+                label={({ name, percent }) => `${name}: ${(percent ?? 0 * 100).toFixed(0)}%`}
+              >
+                {revenueData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </Paper>
       </Grid>
     </Box>
   );

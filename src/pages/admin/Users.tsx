@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Chip } from "@mui/material";
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Chip, Button } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 
 const Users: React.FC = () => {
@@ -45,7 +45,7 @@ const Users: React.FC = () => {
                       label={user.role}
                       color={
                         user.role === 'admin' ? 'primary' :
-                        user.role === 'instructor' ? 'secondary' : 'default'
+                          user.role === 'instructor' ? 'secondary' : 'default'
                       }
                     />
                   </TableCell>

@@ -139,7 +139,6 @@ const Sidebar = () => {
               </Typography>
             )}
             <Item title="All Workshops" to="/admin/workshops" icon={<Icons.workshops />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
-            <Item title="Create Workshop" to="/admin/workshops/create" icon={<Icons.create />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
             <Item title="Time Slots" to="/admin/time-slots" icon={<Icons.timeSlots />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
 
             {!isCollapsed && (
