@@ -1,29 +1,43 @@
-import React from "react";
-import { Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import {
+  Box,
+  Button,
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-import { InputField } from "@/components/auth/FormFields";
-import { signUpSchema, } from "@/lib/schema/signupSchema";
-import { useUserStore } from "@/store/useUserStore";
+  Typography,
+  TextField,
+  Divider,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import Grid from '@mui/material/Grid';
+import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
+import { signUpSchema } from "../../lib/schema/signupSchema";
 
-const Signup = () => {
-  const { signup,loading } = useUserStore();
-  console.log("loading", loading);
-  const navigate = useNavigate(); // ✅ FIXED: added missing hook
+type SignUpFormValues = {
+  fullname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
-  const form = useForm({
+const Signup: React.FC = () => {
+  const [pending, setPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  // const { signup } = useUserStore();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       fullname: "",
@@ -33,104 +47,199 @@ const Signup = () => {
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: SignUpFormValues) => {
     try {
-      await signup(data);
-      form.reset();
+      setPending(true);
+      // await signup(data);
+      reset();
       navigate("/verify-email");
     } catch (error) {
       console.error("Signup error:", error);
+    } finally {
+      setPending(false);
     }
   };
 
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-background/80 p-4">
-      <div className="w-full max-w-md">
-        <Card className="border-none shadow-lg">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
-              Create an account
-            </CardTitle>
-            <CardDescription className="text-center">
-              Enter your information to create your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <InputField
-                  control={form.control}
-                  name="fullname"
-                  label="Full name"
-                  placeholder="John Doe"
-                  type="text"
-                  icon={<User className="h-5 w-5 text-muted-foreground" />}
-                />
-                <InputField
-                  control={form.control}
-                  name="email"
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+        p: 2,
+      }}
+    >
+      <Card sx={{ maxWidth: 450, width: "100%", boxShadow: 4 }}>
+        <CardHeader
+          title="Create an account"
+          subheader="Enter your information to create your account"
+          titleTypographyProps={{
+            align: "center",
+            fontWeight: "bold",
+            fontSize: 22
+          }}
+          subheaderTypographyProps={{ align: "center" }}
+        />
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Grid container spacing={2}>
+              {/* Full Name Field */}
+              <Controller
+                name="fullname"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Full name"
+                    type="text"
+                    fullWidth
+                    error={!!errors.fullname}
+                    helperText={errors.fullname?.message}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <User size={20} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+
+            {/* Email Field */}
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
                   label="Email"
-                  placeholder="john.doe@example.com"
                   type="email"
-                  icon={<Mail className="h-5 w-5 text-muted-foreground" />}
+                  fullWidth
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Mail size={20} />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-                <InputField
-                  control={form.control}
-                  name="password"
-                  label="Password"
-                  placeholder="••••••••"
-                  type="password"
-                  icon={<Lock className="h-5 w-5 text-muted-foreground" />}
-                  showPasswordToggle
-                />
-                <InputField
-                  control={form.control}
-                  name="confirmPassword"
-                  label="Confirm Password"
-                  placeholder="••••••••"
-                  type="password"
-                  icon={<Lock className="h-5 w-5 text-muted-foreground" />}
-                  showPasswordToggle
-                />
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Please wait...
-                    </>
-                  ) : (
-                    <>
-                      Sign up <ArrowRight className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-              </div>
-            </div>
-            <GoogleAuthButton
-              action="signup"
-              buttonText="Sign up with Google"
-              redirectTo="/dashboard"
+              )}
             />
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Link to="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-                Log in
-              </Link>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
-    </div>
+
+            {/* Password Field */}
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock size={20} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+
+            {/* Confirm Password Field */}
+            <Controller
+              name="confirmPassword"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Confirm Password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  fullWidth
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword?.message}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock size={20} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={toggleConfirmPasswordVisibility}
+                          edge="end"
+                        >
+                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+
+            {/* Submit Button */}
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={pending}
+              startIcon={pending ? <Loader2 className="animate-spin" size={18} /> : null}
+              endIcon={!pending ? <ArrowRight size={18} /> : null}
+            >
+              {pending ? "Please wait..." : "Sign up"}
+            </Button>
+          </form>
+        </CardContent>
+
+        <Divider sx={{ my: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            OR CONTINUE WITH
+          </Typography>
+        </Divider>
+
+        <CardContent>
+          {/* Google Auth Button would go here */}
+          <Button
+            fullWidth
+            variant="outlined"
+          >
+            Sign up with Google
+          </Button>
+
+          <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+            Already have an account?{" "}
+            <Link to="/login" style={{ fontWeight: "bold" }}>
+              Log in
+            </Link>
+          </Typography>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

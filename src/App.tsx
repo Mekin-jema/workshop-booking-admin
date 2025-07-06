@@ -16,11 +16,16 @@ import Dashboard from "./admin/Dashboard";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./layouts/AdminLayout";
 import Login from "./components/Auth/Login";
+import Signup from "./components/Auth/Signup";
 
 const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <Signup />,
   },
   {
     path: "/admin",

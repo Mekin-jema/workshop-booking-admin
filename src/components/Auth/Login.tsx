@@ -167,14 +167,7 @@ const Login: React.FC = () => {
         <Divider sx={{ my: 1 }} />
 
         <CardContent>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => navigate("/dashboard")}
-            startIcon={<img src="/google-icon.svg" alt="Google" width={20} />}
-          >
-            Continue with Google
-          </Button>
+
 
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
             Don&apos;t have an account?{" "}
