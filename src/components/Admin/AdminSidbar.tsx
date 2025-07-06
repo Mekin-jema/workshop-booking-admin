@@ -139,7 +139,6 @@ const Sidebar = () => {
               </Typography>
             )}
             <Item title="All Workshops" to="/admin/workshops" icon={<Icons.workshops />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
-            <Item title="Time Slots" to="/admin/time-slots" icon={<Icons.timeSlots />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
 
             {!isCollapsed && (
               <Typography variant="overline" sx={sectionStyle}>
@@ -147,7 +146,6 @@ const Sidebar = () => {
               </Typography>
             )}
             <Item title="All Bookings" to="/admin/bookings" icon={<Icons.bookings />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
-            <Item title="Invoices" to="/admin/invoices" icon={<Icons.invoices />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
 
             {!isCollapsed && (
               <Typography variant="overline" sx={sectionStyle}>

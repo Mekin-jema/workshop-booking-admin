@@ -1,85 +1,50 @@
-import React from "react";
-import { Box, Typography, Paper, Grid } from "@mui/material";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { Box, Typography, Button } from "@mui/material";
+import { Rocket, Mail, Calendar } from "lucide-react";
 
-const WorkshopAnalytics: React.FC = () => {
-  const attendanceData = [
-    { name: "Woodworking", attendance: 45 },
-    { name: "Pottery", attendance: 35 },
-    { name: "Welding", attendance: 25 },
-    { name: "Painting", attendance: 30 },
-  ];
-
-  const revenueData = [
-    { name: "Woodworking", revenue: 5400 },
-    { name: "Pottery", revenue: 6300 },
-    { name: "Welding", revenue: 5000 },
-    { name: "Painting", revenue: 3600 },
-  ];
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
+const WorkshopAnalytics = () => {
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Workshop Analytics
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+        p: 3,
+        background: "#f8f9fa",
+      }}
+    >
+      <Rocket size={80} color="#3f51b5" strokeWidth={1.5} />
+
+      <Typography variant="h3" sx={{ mt: 3, mb: 2, fontWeight: 700 }}>
+        Coming Soon
       </Typography>
 
-      <Grid container spacing={3}>
-        <Paper elevation={3} sx={{ p: 2, height: 400 }}>
-          <Typography variant="h6" gutterBottom>
-            Workshop Attendance
-          </Typography>
-          <ResponsiveContainer width="100%" height="90%">
-            <BarChart data={attendanceData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="attendance" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Paper>
+      <Typography variant="h6" sx={{ mb: 4, maxWidth: 500 }}>
+        We're working on something exciting! Stay tuned for our launch.
+      </Typography>
 
-        <Paper elevation={3} sx={{ p: 2, height: 400 }}>
-          <Typography variant="h6" gutterBottom>
-            Revenue by Workshop
-          </Typography>
-          <ResponsiveContainer width="100%" height="90%">
-            <PieChart>
-              <Pie
-                data={revenueData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="revenue"
-                nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent ?? 0 * 100).toFixed(0)}%`}
-              >
-                {revenueData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </Paper>
-      </Grid>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 4 }}>
+        <Calendar size={20} color="#757575" />
+        <Typography color="text.secondary">
+          Launching January 2024
+        </Typography>
+      </Box>
+
+      <Button
+        variant="contained"
+        size="large"
+        startIcon={<Mail size={20} />}
+        sx={{
+          px: 4,
+          py: 1.5,
+          borderRadius: 2,
+          fontWeight: 600,
+        }}
+      >
+        Notify Me
+      </Button>
     </Box>
   );
 };
