@@ -169,7 +169,6 @@ const Sidebar = () => {
             )}
             <Item title="Profile" to="/admin/profile" icon={<Icons.profile />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
             <Item title="Settings" to="/admin/settings" icon={<Icons.settings />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
-            <Item title="Logout" to="/logout" icon={<Icons.logout />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
           </Box>
         </Menu>
       </ProSidebar>
