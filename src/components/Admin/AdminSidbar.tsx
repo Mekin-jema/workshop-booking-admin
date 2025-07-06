@@ -10,7 +10,6 @@ import {
   IconButton,
   Typography,
   useTheme,
-  Avatar,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -25,7 +24,7 @@ interface ItemProps {
   pathname: string;
 }
 
-const Item = ({ title, to, icon, selected, setSelected, pathname }: ItemProps) => {
+const Item = ({ title, to, icon, setSelected, pathname }: ItemProps) => {
   const theme = useTheme();
   const isActive = pathname === to;
 
@@ -52,6 +51,7 @@ const Item = ({ title, to, icon, selected, setSelected, pathname }: ItemProps) =
 
 const Sidebar = () => {
   const { user } = useSelector((state: any) => state.auth);
+  console.log(user)
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("/admin"); // default path
   const theme = useTheme();

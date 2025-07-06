@@ -1,7 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+ interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "USER" | string; // Add more roles if needed
+}
+
+
 const initialState = {
-  user: null,
+  user: null as User | null,
   token: null,
 };
 

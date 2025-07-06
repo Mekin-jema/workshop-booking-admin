@@ -376,7 +376,7 @@ const Workshops: React.FC = () => {
 
                 <Divider>Time Slots</Divider>
 
-                {currentWorkshop.timeSlots.map((slot: any, index: number) => (
+                {currentWorkshop.timeSlots.map((slot: any, _index: number) => (
                   <Stack key={slot.id} direction="row" spacing={2} alignItems="center">
                     <TextField
                       select

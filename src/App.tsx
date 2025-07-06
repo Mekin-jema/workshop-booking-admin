@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import AdminLayout from "./layouts/AdminLayout";
 import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/Signup";
+import ProtectedRoute from "./components/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />, // 🟢 Use layout here
+    element: <ProtectedRoute>
+
+      <AdminLayout />
+    </ProtectedRoute>,
     children: [
       { index: true, element: <Dashboard /> },
       { path: "workshops", element: <Workshops /> },

@@ -6,8 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { signUpSchema } from "../../lib/schema/signupSchema";
 import { toast } from "sonner";
 import { useRegisterMutation } from "../../Redux/features/auth/authApiSlice";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "../../Redux/features/auth/authSlice";
 
 
 type SignUpFormValues = {
@@ -22,10 +20,9 @@ const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Assuming you have a hook to get the dispatch function
 
 
-  const [register, { error, data, isSuccess }] = useRegisterMutation();
+  const [register, { error, isSuccess }] = useRegisterMutation();
 
   useEffect(() => {
     if (error) {

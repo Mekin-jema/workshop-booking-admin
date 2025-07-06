@@ -396,7 +396,8 @@ const Dashboard = () => {
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
-                      {workshopData.map((entry, index) => (
+                      {workshopData.map((_entry, index) => (
+
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>

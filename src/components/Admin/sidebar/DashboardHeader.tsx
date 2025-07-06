@@ -1,12 +1,11 @@
 // import ThemeSwitcher from "@/app/utils/ThemeSwitcher";
 import { Bell } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 
 
-type Props = {};
 
-const DashboardHeader = (props: Props) => {
+const DashboardHeader = () => {
   const [open, setOpen] = useState(false);
   return (
     <div>
