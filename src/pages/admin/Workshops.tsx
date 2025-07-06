@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,7 +20,9 @@ import {
   TextField,
   Stack,
   MenuItem,
-  Divider
+  Divider,
+  Alert,
+  CircularProgress
 } from "@mui/material";
 import {
   Plus,
@@ -39,50 +41,136 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { toast } from "sonner";
+import { useCreateWorkshopMutation, useDeleteWorkshopMutation, useGetWorkshopsQuery, useUpdateWorkshopMutation } from "../../Redux/features/workshops/workshopApiSlice";
+
+interface TimeSlot {
+  id?: number;
+  startTime: string;
+  endTime: string;
+  availableSpots?: number;
+}
+
+interface Workshop {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  maxCapacity: number;
+  timeSlots: TimeSlot[];
+  isDeleted: boolean;
+}
 
 const Workshops: React.FC = () => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [currentWorkshop, setCurrentWorkshop] = useState<any>(null);
-  const [timeSlots, setTimeSlots] = useState<Array<{ startTime: string, endTime: string }>>([{ startTime: '', endTime: '' }]);
+  const [currentWorkshop, setCurrentWorkshop] = useState<Workshop | null>(null);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([{ startTime: '', endTime: '' }]);
+  const [error, setError] = useState<string | null>(null);
 
-  const workshops = [
-    {
-      id: 1,
-      title: "Woodworking Basics",
-      description: "Learn fundamental woodworking techniques",
-      date: "2023-06-15",
-      maxCapacity: 12,
-      timeSlots: [
-        { id: 1, startTime: "10:00 AM", endTime: "12:00 PM", availableSpots: 8 },
-        { id: 2, startTime: "02:00 PM", endTime: "04:00 PM", availableSpots: 12 }
-      ],
-      isDeleted: false
-    },
-    {
-      id: 2,
-      title: "Advanced Pottery",
-      description: "Master advanced pottery techniques",
-      date: "2023-06-20",
-      maxCapacity: 8,
-      timeSlots: [
-        { id: 3, startTime: "09:00 AM", endTime: "11:00 AM", availableSpots: 3 }
-      ],
-      isDeleted: false
-    },
-  ];
+  // Form state
+  const [workshopTitle, setWorkshopTitle] = useState('');
+  const [workshopDescription, setWorkshopDescription] = useState('');
+  const [workshopDate, setWorkshopDate] = useState<Date | null>(null);
+  const [maxCapacity, setMaxCapacity] = useState<number>(10);
+
+  // Edit form state
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editDate, setEditDate] = useState<Date | null>(null);
+  const [editMaxCapacity, setEditMaxCapacity] = useState<number>(10);
+  const [editTimeSlots, setEditTimeSlots] = useState<TimeSlot[]>([]);
+
+  // RTK Query hooks
+  const {
+    data: workshopsData = [],
+    isLoading: isWorkshopsLoading,
+    isError: isWorkshopsError,
+    error: workshopsError,
+    refetch: refetchWorkshops
+  } = useGetWorkshopsQuery({}, { refetchOnMountOrArgChange: true });
+
+  const [createWorkshop, {
+    isLoading: isCreateLoading,
+    isSuccess: isCreateSuccess,
+    error: createError,
+  }] = useCreateWorkshopMutation();
+
+  const [updateWorkshop, {
+    isLoading: isUpdateLoading,
+    isSuccess: isUpdateSuccess,
+    error: updateError,
+  }] = useUpdateWorkshopMutation();
+
+  const [deleteWorkshop, {
+    isLoading: isDeleteLoading,
+    isSuccess: isDeleteSuccess,
+    error: deleteError,
+  }] = useDeleteWorkshopMutation();
+
+  // Toast notifications
+  useEffect(() => {
+    if (isCreateSuccess) {
+      toast.success("Workshop created successfully!");
+      refetchWorkshops();
+      handleCloseAddDialog();
+    }
+    if (isUpdateSuccess) {
+      toast.success("Workshop updated successfully!");
+      refetchWorkshops();
+      handleCloseEditDialog();
+    }
+    if (isDeleteSuccess) {
+      toast.success("Workshop deleted successfully!");
+      refetchWorkshops();
+    }
+  }, [isCreateSuccess, isUpdateSuccess, isDeleteSuccess, refetchWorkshops]);
+
+  useEffect(() => {
+    if (createError || updateError || deleteError || isWorkshopsError) {
+      const errorData = createError || updateError || deleteError || workshopsError;
+      if (errorData && 'data' in errorData) {
+        toast.error((errorData as any).data.message || "An error occurred");
+      } else {
+        toast.error("An error occurred");
+      }
+    }
+  }, [createError, updateError, deleteError, isWorkshopsError, workshopsError]);
 
   const handleOpenAddDialog = () => setOpenAddDialog(true);
-  const handleCloseAddDialog = () => setOpenAddDialog(false);
-
-  const handleOpenEditDialog = (workshop: any) => {
-    setCurrentWorkshop(workshop);
-    setOpenEditDialog(true);
+  const handleCloseAddDialog = () => {
+    setOpenAddDialog(false);
+    setWorkshopTitle('');
+    setWorkshopDescription('');
+    setWorkshopDate(null);
+    setMaxCapacity(10);
+    setTimeSlots([{ startTime: '', endTime: '' }]);
+    setError(null);
   };
-  const handleCloseEditDialog = () => setOpenEditDialog(false);
+
+  const handleOpenEditDialog = (workshop: Workshop) => {
+    setCurrentWorkshop(workshop);
+    setEditTitle(workshop.title);
+    setEditDescription(workshop.description);
+    setEditDate(new Date(workshop.date));
+    setEditMaxCapacity(workshop.maxCapacity);
+    setEditTimeSlots([...workshop.timeSlots]);
+    setOpenEditDialog(true);
+    setError(null);
+  };
+
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+    setCurrentWorkshop(null);
+    setError(null);
+  };
 
   const handleAddTimeSlot = () => {
     setTimeSlots([...timeSlots, { startTime: '', endTime: '' }]);
+  };
+
+  const handleAddEditTimeSlot = () => {
+    setEditTimeSlots([...editTimeSlots, { startTime: '', endTime: '', availableSpots: editMaxCapacity }]);
   };
 
   const handleRemoveTimeSlot = (index: number) => {
@@ -91,14 +179,112 @@ const Workshops: React.FC = () => {
     setTimeSlots(newTimeSlots);
   };
 
+  const handleRemoveEditTimeSlot = (index: number) => {
+    const newTimeSlots = [...editTimeSlots];
+    newTimeSlots.splice(index, 1);
+    setEditTimeSlots(newTimeSlots);
+  };
+
   const handleTimeSlotChange = (index: number, field: string, value: string) => {
     const newTimeSlots = [...timeSlots];
     newTimeSlots[index] = { ...newTimeSlots[index], [field]: value };
     setTimeSlots(newTimeSlots);
   };
 
-  const getStatusChip = (workshop: any) => {
-    const totalSlots = workshop.timeSlots.reduce((sum: number, slot: any) => sum + slot.availableSpots, 0);
+  const handleEditTimeSlotChange = (index: number, field: string, value: string) => {
+    const newTimeSlots = [...editTimeSlots];
+    newTimeSlots[index] = { ...newTimeSlots[index], [field]: value };
+    setEditTimeSlots(newTimeSlots);
+  };
+
+  const validateTimeSlots = (slots: TimeSlot[]) => {
+    for (const slot of slots) {
+      if (!slot.startTime || !slot.endTime) {
+        return "All time slots must have both start and end times";
+      }
+
+      const startMinutes = convertTimeToMinutes(slot.startTime);
+      const endMinutes = convertTimeToMinutes(slot.endTime);
+
+      if (endMinutes <= startMinutes) {
+        return "End time must be after start time";
+      }
+    }
+    return null;
+  };
+
+  const convertTimeToMinutes = (timeStr: string) => {
+    const [time, period] = timeStr.split(' ');
+    const [hours, minutes] = time.split(':').map(Number);
+    return (hours % 12 + (period === 'PM' ? 12 : 0)) * 60 + minutes;
+  };
+
+  const handleCreateWorkshop = async () => {
+    const timeSlotError = validateTimeSlots(timeSlots);
+    if (!workshopTitle || !workshopDate || timeSlotError) {
+      setError(timeSlotError || "Please fill all required fields");
+      return;
+    }
+
+    try {
+      const newWorkshop = {
+        title: workshopTitle,
+        description: workshopDescription,
+        date: workshopDate.toISOString().split('T')[0],
+        maxCapacity: maxCapacity,
+        timeSlots: timeSlots.map((slot, index) => ({
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          availableSpots: maxCapacity
+        }))
+      };
+
+      await createWorkshop(newWorkshop).unwrap();
+    } catch (err) {
+      console.error("Failed to create workshop:", err);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!currentWorkshop) return;
+
+    const timeSlotError = validateTimeSlots(editTimeSlots);
+    if (!editTitle || !editDate || timeSlotError) {
+      setError(timeSlotError || "Please fill all required fields");
+      return;
+    }
+
+    try {
+      const updatedWorkshop = {
+        id: currentWorkshop.id,
+        title: editTitle,
+        description: editDescription,
+        date: editDate.toISOString().split('T')[0],
+        maxCapacity: editMaxCapacity,
+        timeSlots: editTimeSlots.map(slot => ({
+          id: slot.id,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          availableSpots: slot.availableSpots || editMaxCapacity
+        }))
+      };
+
+      await updateWorkshop(updatedWorkshop).unwrap();
+    } catch (err) {
+      console.error("Failed to update workshop:", err);
+    }
+  };
+
+  const handleDeleteWorkshop = async (id: number) => {
+    try {
+      await deleteWorkshop(id).unwrap();
+    } catch (err) {
+      console.error("Failed to delete workshop:", err);
+    }
+  };
+
+  const getStatusChip = (workshop: Workshop) => {
+    const totalSlots = workshop.timeSlots.reduce((sum, slot) => sum + (slot.availableSpots || 0), 0);
     const percentageFilled = ((workshop.maxCapacity - totalSlots) / workshop.maxCapacity) * 100;
 
     if (percentageFilled >= 80) {
@@ -131,6 +317,16 @@ const Workshops: React.FC = () => {
     }
   };
 
+  const activeWorkshops = workshopsData.filter((workshop: Workshop) => !workshop.isDeleted);
+
+  if (isWorkshopsLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ p: 3 }}>
@@ -161,8 +357,9 @@ const Workshops: React.FC = () => {
                 boxShadow: 'none'
               }
             }}
+            disabled={isCreateLoading}
           >
-            Create New Workshop
+            {isCreateLoading ? <CircularProgress size={24} /> : "Create New Workshop"}
           </Button>
         </Box>
 
@@ -185,7 +382,7 @@ const Workshops: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {workshops.map((workshop) => (
+                {activeWorkshops.map((workshop: Workshop) => (
                   <TableRow
                     key={workshop.id}
                     hover
@@ -199,7 +396,7 @@ const Workshops: React.FC = () => {
                     </TableCell>
                     <TableCell>{new Date(workshop.date).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      {workshop.maxCapacity - workshop.timeSlots.reduce((sum: number, slot: any) => sum + slot.availableSpots, 0)} / {workshop.maxCapacity}
+                      {workshop.maxCapacity - workshop.timeSlots.reduce((sum, slot) => sum + (slot.availableSpots || 0), 0)} / {workshop.maxCapacity}
                     </TableCell>
                     <TableCell>
                       {workshop.timeSlots.map(slot => (
@@ -225,13 +422,18 @@ const Workshops: React.FC = () => {
                           color="primary"
                           onClick={() => handleOpenEditDialog(workshop)}
                           sx={{ mr: 1 }}
+                          disabled={isUpdateLoading}
                         >
                           <Edit size={18} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete Workshop">
-                        <IconButton color="error">
-                          <Trash2 size={18} />
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDeleteWorkshop(workshop.id)}
+                          disabled={isDeleteLoading}
+                        >
+                          {isDeleteLoading ? <CircularProgress size={18} /> : <Trash2 size={18} />}
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -246,16 +448,21 @@ const Workshops: React.FC = () => {
         <Dialog open={openAddDialog} onClose={handleCloseAddDialog} maxWidth="md" fullWidth>
           <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">Create New Workshop</Typography>
-            <IconButton onClick={handleCloseAddDialog}>
+            <IconButton onClick={handleCloseAddDialog} disabled={isCreateLoading}>
               <X size={20} />
             </IconButton>
           </DialogTitle>
           <DialogContent dividers>
             <Stack spacing={3} sx={{ mt: 2 }}>
+              {error && <Alert severity="error">{error}</Alert>}
               <TextField
                 fullWidth
                 label="Workshop Title"
                 variant="outlined"
+                value={workshopTitle}
+                onChange={(e) => setWorkshopTitle(e.target.value)}
+                required
+                disabled={isCreateLoading}
               />
               <TextField
                 fullWidth
@@ -263,16 +470,26 @@ const Workshops: React.FC = () => {
                 variant="outlined"
                 multiline
                 rows={3}
+                value={workshopDescription}
+                onChange={(e) => setWorkshopDescription(e.target.value)}
+                disabled={isCreateLoading}
               />
               <DatePicker
                 label="Workshop Date"
+                value={workshopDate}
+                onChange={(newValue) => setWorkshopDate(newValue)}
                 slotProps={{ textField: { fullWidth: true } }}
+                disabled={isCreateLoading}
               />
               <TextField
                 fullWidth
                 label="Maximum Capacity"
                 type="number"
                 variant="outlined"
+                value={maxCapacity}
+                onChange={(e) => setMaxCapacity(Number(e.target.value))}
+                inputProps={{ min: 1 }}
+                disabled={isCreateLoading}
               />
 
               <Divider>Time Slots</Divider>
@@ -288,6 +505,8 @@ const Workshops: React.FC = () => {
                     InputProps={{
                       endAdornment: <ChevronDown size={18} />,
                     }}
+                    required
+                    disabled={isCreateLoading}
                   >
                     {['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
                       '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'].map(time => (
@@ -303,6 +522,8 @@ const Workshops: React.FC = () => {
                     InputProps={{
                       endAdornment: <ChevronDown size={18} />,
                     }}
+                    required
+                    disabled={isCreateLoading}
                   >
                     {['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
                       '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(time => (
@@ -310,7 +531,11 @@ const Workshops: React.FC = () => {
                       ))}
                   </TextField>
                   {timeSlots.length > 1 && (
-                    <IconButton onClick={() => handleRemoveTimeSlot(index)} color="error">
+                    <IconButton
+                      onClick={() => handleRemoveTimeSlot(index)}
+                      color="error"
+                      disabled={isCreateLoading}
+                    >
                       <Trash2 size={18} />
                     </IconButton>
                   )}
@@ -321,17 +546,27 @@ const Workshops: React.FC = () => {
                 startIcon={<Plus size={18} />}
                 onClick={handleAddTimeSlot}
                 variant="outlined"
+                disabled={isCreateLoading}
               >
                 Add Time Slot
               </Button>
             </Stack>
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
-            <Button onClick={handleCloseAddDialog} variant="outlined">
+            <Button
+              onClick={handleCloseAddDialog}
+              variant="outlined"
+              disabled={isCreateLoading}
+            >
               Cancel
             </Button>
-            <Button variant="contained" color="primary">
-              Create Workshop
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreateWorkshop}
+              disabled={isCreateLoading}
+            >
+              {isCreateLoading ? <CircularProgress size={24} /> : "Create Workshop"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -340,18 +575,22 @@ const Workshops: React.FC = () => {
         <Dialog open={openEditDialog} onClose={handleCloseEditDialog} maxWidth="md" fullWidth>
           <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">Edit Workshop</Typography>
-            <IconButton onClick={handleCloseEditDialog}>
+            <IconButton onClick={handleCloseEditDialog} disabled={isUpdateLoading}>
               <X size={20} />
             </IconButton>
           </DialogTitle>
           <DialogContent dividers>
             {currentWorkshop && (
               <Stack spacing={3} sx={{ mt: 2 }}>
+                {error && <Alert severity="error">{error}</Alert>}
                 <TextField
                   fullWidth
                   label="Workshop Title"
                   variant="outlined"
-                  defaultValue={currentWorkshop.title}
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  required
+                  disabled={isUpdateLoading}
                 />
                 <TextField
                   fullWidth
@@ -359,33 +598,43 @@ const Workshops: React.FC = () => {
                   variant="outlined"
                   multiline
                   rows={3}
-                  defaultValue={currentWorkshop.description}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  disabled={isUpdateLoading}
                 />
                 <DatePicker
                   label="Workshop Date"
-                  defaultValue={new Date(currentWorkshop.date)}
+                  value={editDate}
+                  onChange={(newValue) => setEditDate(newValue)}
                   slotProps={{ textField: { fullWidth: true } }}
+                  disabled={isUpdateLoading}
                 />
                 <TextField
                   fullWidth
                   label="Maximum Capacity"
                   type="number"
                   variant="outlined"
-                  defaultValue={currentWorkshop.maxCapacity}
+                  value={editMaxCapacity}
+                  onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
+                  inputProps={{ min: 1 }}
+                  disabled={isUpdateLoading}
                 />
 
                 <Divider>Time Slots</Divider>
 
-                {currentWorkshop.timeSlots.map((slot: any, _index: number) => (
-                  <Stack key={slot.id} direction="row" spacing={2} alignItems="center">
+                {editTimeSlots.map((slot, index) => (
+                  <Stack key={index} direction="row" spacing={2} alignItems="center">
                     <TextField
                       select
                       label="Start Time"
-                      defaultValue={slot.startTime}
+                      value={slot.startTime}
+                      onChange={(e) => handleEditTimeSlotChange(index, 'startTime', e.target.value)}
                       sx={{ flex: 1 }}
                       InputProps={{
                         endAdornment: <ChevronDown size={18} />,
                       }}
+                      required
+                      disabled={isUpdateLoading}
                     >
                       {['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
                         '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'].map(time => (
@@ -395,19 +644,26 @@ const Workshops: React.FC = () => {
                     <TextField
                       select
                       label="End Time"
-                      defaultValue={slot.endTime}
+                      value={slot.endTime}
+                      onChange={(e) => handleEditTimeSlotChange(index, 'endTime', e.target.value)}
                       sx={{ flex: 1 }}
                       InputProps={{
                         endAdornment: <ChevronDown size={18} />,
                       }}
+                      required
+                      disabled={isUpdateLoading}
                     >
                       {['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
                         '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'].map(time => (
                           <MenuItem key={time} value={time}>{time}</MenuItem>
                         ))}
                     </TextField>
-                    {currentWorkshop.timeSlots.length > 1 && (
-                      <IconButton color="error">
+                    {editTimeSlots.length > 1 && (
+                      <IconButton
+                        onClick={() => handleRemoveEditTimeSlot(index)}
+                        color="error"
+                        disabled={isUpdateLoading}
+                      >
                         <Trash2 size={18} />
                       </IconButton>
                     )}
@@ -416,7 +672,9 @@ const Workshops: React.FC = () => {
 
                 <Button
                   startIcon={<Plus size={18} />}
+                  onClick={handleAddEditTimeSlot}
                   variant="outlined"
+                  disabled={isUpdateLoading}
                 >
                   Add Time Slot
                 </Button>
@@ -424,11 +682,20 @@ const Workshops: React.FC = () => {
             )}
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
-            <Button onClick={handleCloseEditDialog} variant="outlined">
+            <Button
+              onClick={handleCloseEditDialog}
+              variant="outlined"
+              disabled={isUpdateLoading}
+            >
               Cancel
             </Button>
-            <Button variant="contained" color="primary">
-              Save Changes
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSaveChanges}
+              disabled={isUpdateLoading}
+            >
+              {isUpdateLoading ? <CircularProgress size={24} /> : "Save Changes"}
             </Button>
           </DialogActions>
         </Dialog>
