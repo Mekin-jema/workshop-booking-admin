@@ -153,7 +153,6 @@ const Sidebar = () => {
               </Typography>
             )}
             <Item title="All Users" to="/admin/users" icon={<Icons.users />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
-            <Item title="Manage Team" to="/admin/team" icon={<Icons.team />} selected={selected} setSelected={setSelected} pathname={location.pathname} />
 
             {!isCollapsed && (
               <Typography variant="overline" sx={sectionStyle}>
