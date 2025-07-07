@@ -5,7 +5,6 @@ import Workshops from "./pages/admin/Workshops";
 // import CreateWorkshop from "./pages/admin/CreateWorkshop";
 import TimeSlots from "./pages/admin/TimeSlots";
 import Bookings from "./pages/admin/Bookings";
-import Invoices from "./pages/admin/Invoices";
 import Users from "./pages/admin/Users";
 // import Team from "./pages/admin/Team";
 import WorkshopAnalytics from "./pages/admin/WorkshopAnalytics";
@@ -40,7 +39,6 @@ const router = createBrowserRouter([
       // { path: "workshops/create", element: <CreateWorkshop /> },
       { path: "time-slots", element: <TimeSlots /> },
       { path: "bookings", element: <Bookings /> },
-      { path: "invoices", element: <Invoices /> },
       { path: "users", element: <Users /> },
       // { path: "team", element: <Team /> },
       { path: "analytics/workshops", element: <WorkshopAnalytics /> },

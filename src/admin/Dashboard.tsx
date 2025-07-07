@@ -182,13 +182,31 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
+
+
   const user = {
     name: "Admin User",
     role: "ADMIN",
     avatar: "https://i.pravatar.cc/150?img=3",
+
+
+
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  if (!user) {
+    setRecentBookings([]);
+    setStats({
+      totalBookings: 124,
+      totalWorkshops: 8,
+      popularWorkshop: {
+        title: "Advanced JavaScript",
+        bookings: 45
+      }
+    })
+    setUpcomingWorkshops([]);
+  }
 
   useEffect(() => {
     // Simulate API call

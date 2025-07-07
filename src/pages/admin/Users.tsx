@@ -25,16 +25,17 @@ import {
   Select,
   MenuItem
 } from "@mui/material";
+
 import {
-  Edit,
-  Delete,
+  Pencil,
+  Trash2,
   Search,
-  FilterList,
-  PersonAdd,
-  Refresh,
-  Close,
+  Filter,
+  UserPlus,
+  RefreshCcw,
+  X,
   Save
-} from "@mui/icons-material";
+} from "lucide-react";
 
 const Users: React.FC = () => {
   const [searchText, setSearchText] = useState("");
@@ -79,7 +80,6 @@ const Users: React.FC = () => {
   };
 
   const handleSaveUser = () => {
-    // Here you would typically make an API call to save the changes
     console.log("Saving user:", currentUser);
     handleCloseEditDialog();
   };
@@ -118,25 +118,25 @@ const Users: React.FC = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <Search size={18} />
                 </InputAdornment>
               ),
             }}
           />
           <Tooltip title="Filter">
             <IconButton>
-              <FilterList />
+              <Filter size={18} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Refresh">
             <IconButton>
-              <Refresh />
+              <RefreshCcw size={18} />
             </IconButton>
           </Tooltip>
           <Button
             variant="contained"
             color="primary"
-            startIcon={<PersonAdd />}
+            startIcon={<UserPlus size={18} />}
             sx={{ whiteSpace: 'nowrap' }}
           >
             Add User
@@ -194,12 +194,12 @@ const Users: React.FC = () => {
                         color="primary"
                         onClick={() => handleOpenEditDialog(user)}
                       >
-                        <Edit fontSize="small" />
+                        <Pencil size={16} />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete">
                       <IconButton color="error">
-                        <Delete fontSize="small" />
+                        <Trash2 size={16} />
                       </IconButton>
                     </Tooltip>
                   </TableCell>
@@ -216,7 +216,7 @@ const Users: React.FC = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6">Edit User</Typography>
             <IconButton onClick={handleCloseEditDialog}>
-              <Close />
+              <X size={18} />
             </IconButton>
           </Box>
         </DialogTitle>
@@ -283,7 +283,7 @@ const Users: React.FC = () => {
           <Button
             onClick={handleCloseEditDialog}
             variant="outlined"
-            startIcon={<Close />}
+            startIcon={<X size={16} />}
           >
             Cancel
           </Button>
@@ -291,7 +291,7 @@ const Users: React.FC = () => {
             onClick={handleSaveUser}
             variant="contained"
             color="primary"
-            startIcon={<Save />}
+            startIcon={<Save size={16} />}
           >
             Save Changes
           </Button>

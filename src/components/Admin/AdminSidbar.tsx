@@ -14,6 +14,7 @@ import {
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { Icons } from "./sidebar/Icon";
+import type { RootState } from "../../Redux/app/store";
 
 interface ItemProps {
   title: string;
@@ -50,7 +51,7 @@ const Item = ({ title, to, icon, setSelected, pathname }: ItemProps) => {
 };
 
 const Sidebar = () => {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   console.log(user)
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("/admin"); // default path

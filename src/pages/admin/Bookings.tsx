@@ -13,88 +13,29 @@ import {
   IconButton,
   Pagination,
   Menu,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import {
-  MoreVert,
-  Visibility,
-  Cancel,
+  MoreVertical,
+  Eye,
+  XCircle,
   CheckCircle,
-  Refresh,
-} from "@mui/icons-material";
+  RefreshCcw,
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import { useGetAllBookingsQuery } from "../../Redux/features/bookings/bookingApiSlice";
+import type { Booking } from "../../types";
 
-// Mock data that matches your Prisma schema
-const mockBookings = [
-  {
-    id: 1,
-    customer: {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com"
-    },
-    workshop: {
-      id: 1,
-      title: "Advanced JavaScript",
-      date: "2023-07-15T00:00:00Z"
-    },
-    timeSlot: {
-      id: 1,
-      startTime: "10:00 AM",
-      endTime: "12:00 PM"
-    },
-    status: "CONFIRMED",
-    createdAt: "2023-06-10T09:30:00Z"
-  },
-  {
-    id: 2,
-    customer: {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com"
-    },
-    workshop: {
-      id: 2,
-      title: "Web Development",
-      date: "2023-07-20T00:00:00Z"
-    },
-    timeSlot: {
-      id: 2,
-      startTime: "02:00 PM",
-      endTime: "04:00 PM"
-    },
-    status: "PENDING",
-    createdAt: "2023-06-12T11:45:00Z"
-  },
-  {
-    id: 3,
-    customer: {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com"
-    },
-    workshop: {
-      id: 3,
-      title: "Data Science",
-      date: "2023-07-25T00:00:00Z"
-    },
-    timeSlot: {
-      id: 3,
-      startTime: "09:00 AM",
-      endTime: "11:00 AM"
-    },
-    status: "CANCELLED",
-    createdAt: "2023-06-15T14:20:00Z"
-  }
-];
-
-const Bookings: React.FC = () => {
-  const [bookings] = useState(mockBookings);
+const AdminBookings: React.FC = () => {
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, booking: any) => {
+  const { data: bookings = [] } = useGetAllBookingsQuery({}, {
+    refetchOnMountOrArgChange: true
+  });
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, booking: Booking) => {
     setAnchorEl(event.currentTarget);
     setSelectedBooking(booking);
   };
@@ -105,8 +46,7 @@ const Bookings: React.FC = () => {
   };
 
   const handleStatusChange = (newStatus: string) => {
-    // In a real app, this would call your API to update the status
-    console.log(`Changing booking ${selectedBooking.id} to ${newStatus}`);
+    console.log(`Changing booking ${selectedBooking?.id} to ${newStatus}`);
     handleMenuClose();
   };
 
@@ -119,7 +59,7 @@ const Bookings: React.FC = () => {
       case 'CONFIRMED':
         return (
           <Chip
-            icon={<CheckCircle fontSize="small" />}
+            icon={<CheckCircle size={16} />}
             label="Confirmed"
             color="success"
             size="small"
@@ -129,7 +69,7 @@ const Bookings: React.FC = () => {
       case 'PENDING':
         return (
           <Chip
-            icon={<Refresh fontSize="small" />}
+            icon={<RefreshCcw size={16} />}
             label="Pending"
             color="warning"
             size="small"
@@ -139,7 +79,7 @@ const Bookings: React.FC = () => {
       case 'CANCELLED':
         return (
           <Chip
-            icon={<Cancel fontSize="small" />}
+            icon={<XCircle size={16} />}
             label="Cancelled"
             color="error"
             size="small"
@@ -153,19 +93,10 @@ const Bookings: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        mb: 3
-      }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Bookings Management
-        </Typography>
-
-      </Box>
-
-      <Paper elevation={3} sx={{ mb: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        Booking Management
+      </Typography>
+      <Paper elevation={3}>
         <TableContainer>
           <Table>
             <TableHead>
@@ -179,7 +110,7 @@ const Bookings: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {bookings.map((booking) => (
+              {bookings?.data?.map((booking: Booking) => (
                 <TableRow key={booking.id}>
                   <TableCell>
                     <Typography fontWeight="medium">{booking.customer.name}</Typography>
@@ -197,15 +128,10 @@ const Bookings: React.FC = () => {
                   <TableCell>
                     {booking.timeSlot.startTime} - {booking.timeSlot.endTime}
                   </TableCell>
+                  <TableCell>{getStatusChip(booking.status)}</TableCell>
                   <TableCell>
-                    {getStatusChip(booking.status)}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={(e) => handleMenuOpen(e, booking)}
-                      size="small"
-                    >
-                      <MoreVert />
+                    <IconButton onClick={(e) => handleMenuOpen(e, booking)} size="small">
+                      <MoreVertical size={18} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -215,7 +141,7 @@ const Bookings: React.FC = () => {
         </TableContainer>
       </Paper>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+      <Box display="flex" justifyContent="center" mt={2}>
         <Pagination
           count={Math.ceil(bookings.length / 10)}
           page={page}
@@ -224,27 +150,19 @@ const Bookings: React.FC = () => {
         />
       </Box>
 
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => handleStatusChange('CONFIRMED')} disabled={selectedBooking?.status === 'CONFIRMED'}>
-          <CheckCircle color="success" sx={{ mr: 1 }} />
-          Confirm
+          <CheckCircle size={18} style={{ marginRight: 8, color: 'green' }} /> Confirm
         </MenuItem>
         <MenuItem onClick={() => handleStatusChange('CANCELLED')} disabled={selectedBooking?.status === 'CANCELLED'}>
-          <Cancel color="error" sx={{ mr: 1 }} />
-          Cancel
+          <XCircle size={18} style={{ marginRight: 8, color: 'red' }} /> Cancel
         </MenuItem>
         <MenuItem component={Link} to={`/admin/bookings/${selectedBooking?.id}`}>
-          <Visibility color="info" sx={{ mr: 1 }} />
-          View Details
+          <Eye size={18} style={{ marginRight: 8, color: 'blue' }} /> View Details
         </MenuItem>
       </Menu>
     </Box>
   );
 };
 
-export default Bookings;
+export default AdminBookings;

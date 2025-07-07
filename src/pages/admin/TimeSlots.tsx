@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Plus } from "lucide-react";
 
 const TimeSlots: React.FC = () => {
   const timeSlots = [
@@ -13,7 +13,7 @@ const TimeSlots: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">Time Slots</Typography>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />}>
+        <Button variant="contained" color="primary" startIcon={<Plus />}>
           Add Time Slot
         </Button>
       </Box>

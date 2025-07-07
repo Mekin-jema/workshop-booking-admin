@@ -232,7 +232,7 @@ const Workshops: React.FC = () => {
         description: workshopDescription,
         date: workshopDate.toISOString().split('T')[0],
         maxCapacity: maxCapacity,
-        timeSlots: timeSlots.map((slot, index) => ({
+        timeSlots: timeSlots.map((slot, _index) => ({
           startTime: slot.startTime,
           endTime: slot.endTime,
           availableSpots: maxCapacity
