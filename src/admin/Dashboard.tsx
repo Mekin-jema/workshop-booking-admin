@@ -40,188 +40,90 @@ import {
   ResponsiveContainer
 } from "recharts";
 import { Link } from "react-router-dom";
+import type { Booking, Workshop } from "../types";
+import { useGetWorkshopsQuery } from "../Redux/features/workshops/workshopApiSlice";
+import { useGetAllBookingsQuery } from "../Redux/features/bookings/bookingApiSlice";
 
-// Mock data that matches your Prisma schema
-const mockStats = {
-  totalBookings: 124,
-  totalWorkshops: 8,
-  popularWorkshop: {
-    title: "Advanced JavaScript",
-    bookings: 45
-  }
-};
-
-const mockRecentBookings = [
-  {
-    id: 1,
-    customer: {
-      name: "Alice Smith",
-      email: "alice@example.com"
-    },
-    workshop: {
-      title: "Advanced JavaScript"
-    },
-    timeSlot: {
-      startTime: "10:00 AM",
-      endTime: "12:00 PM"
-    },
-    status: "CONFIRMED",
-    createdAt: "2023-07-15T09:30:00Z"
-  },
-  {
-    id: 2,
-    customer: {
-      name: "Bob Johnson",
-      email: "bob@example.com"
-    },
-    workshop: {
-      title: "Web Development"
-    },
-    timeSlot: {
-      startTime: "02:00 PM",
-      endTime: "04:00 PM"
-    },
-    status: "PENDING",
-    createdAt: "2023-07-16T11:45:00Z"
-  },
-  {
-    id: 3,
-    customer: {
-      name: "Charlie Brown",
-      email: "charlie@example.com"
-    },
-    workshop: {
-      title: "Data Science"
-    },
-    timeSlot: {
-      startTime: "09:00 AM",
-      endTime: "11:00 AM"
-    },
-    status: "CONFIRMED",
-    createdAt: "2023-07-17T08:15:00Z"
-  },
-  {
-    id: 4,
-    customer: {
-      name: "Diana Prince",
-      email: "diana@example.com"
-    },
-    workshop: {
-      title: "UX Design"
-    },
-    timeSlot: {
-      startTime: "01:00 PM",
-      endTime: "03:00 PM"
-    },
-    status: "CANCELLED",
-    createdAt: "2023-07-18T10:20:00Z"
-  }
-];
-
-const mockUpcomingWorkshops = [
-  {
-    id: 1,
-    title: "Advanced JavaScript",
-    description: "Learn advanced JavaScript concepts and patterns",
-    date: "2023-08-15T00:00:00Z",
-    maxCapacity: 20,
-    timeSlots: [
-      {
-        id: 1,
-        startTime: "10:00 AM",
-        endTime: "12:00 PM",
-        availableSpots: 5
-      },
-      {
-        id: 2,
-        startTime: "02:00 PM",
-        endTime: "04:00 PM",
-        availableSpots: 8
-      }
-    ],
-    isDeleted: false
-  },
-  {
-    id: 2,
-    title: "React Masterclass",
-    description: "Deep dive into React hooks and performance optimization",
-    date: "2023-08-20T00:00:00Z",
-    maxCapacity: 15,
-    timeSlots: [
-      {
-        id: 3,
-        startTime: "09:00 AM",
-        endTime: "12:00 PM",
-        availableSpots: 2
-      }
-    ],
-    isDeleted: false
-  },
-  {
-    id: 3,
-    title: "Node.js Fundamentals",
-    description: "Build scalable server-side applications with Node.js",
-    date: "2023-08-25T00:00:00Z",
-    maxCapacity: 12,
-    timeSlots: [
-      {
-        id: 4,
-        startTime: "01:00 PM",
-        endTime: "04:00 PM",
-        availableSpots: 12
-      }
-    ],
-    isDeleted: false
-  }
-];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const Dashboard = () => {
-  const [stats, setStats] = useState(mockStats);
-  const [recentBookings, setRecentBookings] = useState(mockRecentBookings);
-  const [upcomingWorkshops, setUpcomingWorkshops] = useState(mockUpcomingWorkshops);
-  const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState(false);
+  // Fetch data from APIs
+  const {
+    data: workshopsData = [],
+    isLoading: isWorkshopsLoading,
+    // isError: isWorkshopsError,
+    refetch: refetchWorkshops
+  } = useGetWorkshopsQuery({}, { refetchOnMountOrArgChange: true });
 
+  const {
+    data: bookingsData = { data: [], meta: { total: 0 } },
+    isLoading: isBookingsLoading,
+    // isError: isBookingsError,
+    refetch: refetchBookings
+  } = useGetAllBookingsQuery({}, { refetchOnMountOrArgChange: true });
 
+  const [stats, setStats] = useState({
+    totalBookings: 0,
+    totalWorkshops: 0,
+    popularWorkshop: {
+      title: "",
+      bookings: 0
+    }
+  });
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [upcomingWorkshops, setUpcomingWorkshops] = useState([]);
 
   const user = {
     name: "Admin User",
     role: "ADMIN",
     avatar: "https://i.pravatar.cc/150?img=3",
-
-
-
   };
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
-  if (!user) {
-    setRecentBookings([]);
-    setStats({
-      totalBookings: 124,
-      totalWorkshops: 8,
-      popularWorkshop: {
-        title: "Advanced JavaScript",
-        bookings: 45
-      }
-    })
-    setUpcomingWorkshops([]);
-  }
-
+  // Calculate statistics when data changes
   useEffect(() => {
-    // Simulate API call
-    const fetchData = async () => {
-      setLoading(true);
-      // In a real app, you would use axios or fetch here
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setLoading(false);
-    };
+    if (bookingsData.data && workshopsData) {
+      // Calculate total bookings
+      const totalBookings = bookingsData.meta.total;
 
-    fetchData();
-  }, [refresh]);
+      // Calculate active workshops (non-deleted)
+      const activeWorkshops = workshopsData.filter((workshop: Workshop) => !workshop.isDeleted);
+
+      // Calculate popular workshop
+      const workshopBookingCounts: { [title: string]: number } = {};
+      bookingsData.data.forEach((booking: Booking) => {
+        const workshopTitle = booking.workshop.title;
+        workshopBookingCounts[workshopTitle] = (workshopBookingCounts[workshopTitle] || 0) + 1;
+      });
+
+      let popularWorkshop = { title: "", bookings: 0 };
+      Object.entries(workshopBookingCounts).forEach(([title, count]) => {
+        if (count > popularWorkshop.bookings) {
+          popularWorkshop = { title, bookings: count };
+        }
+      });
+
+      setStats({
+        totalBookings,
+        totalWorkshops: activeWorkshops.length,
+        popularWorkshop
+      });
+
+      // Set recent bookings (first 4 from the response)
+      setRecentBookings(bookingsData.data.slice(0, 4));
+
+      // Set upcoming workshops (filter non-deleted and future dates)
+      const now = new Date();
+      const upcoming = workshopsData
+        .filter((workshop: Workshop) => !workshop.isDeleted && new Date(workshop.date) > now)
+        .sort((a: Workshop, b: Workshop) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(0, 3);
+      setUpcomingWorkshops(upcoming);
+    }
+  }, [bookingsData, workshopsData]);
 
   const handleRefresh = () => {
-    setRefresh(prev => !prev);
+    refetchWorkshops();
+    refetchBookings();
   };
 
   const getStatusChip = (status: string): React.ReactNode => {
@@ -258,7 +160,7 @@ const Dashboard = () => {
     }
   };
 
-  // Generate booking trend data based on mock stats
+  // Generate booking trend data (mock data for now)
   const bookingData = [
     { name: "Jan", bookings: 40 },
     { name: "Feb", bookings: 65 },
@@ -274,6 +176,8 @@ const Dashboard = () => {
     { name: "Other Workshops", value: stats.totalBookings - stats.popularWorkshop.bookings }
   ] : [];
 
+  const isLoading = isWorkshopsLoading || isBookingsLoading;
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -288,32 +192,10 @@ const Dashboard = () => {
         <Typography variant="h4" sx={{ fontWeight: 700 }}>
           Dashboard Overview
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Tooltip title="Refresh Data">
-            <IconButton onClick={handleRefresh} color="primary">
-              <RefreshCw size={20} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Notifications">
-            <IconButton>
-              <Bell size={20} color="#4CAF50" />
-            </IconButton>
-          </Tooltip>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <img
-              src={user.avatar}
-              alt={user.name}
-              style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid #673AB7' }}
-            />
-            <Box>
-              <Typography fontWeight={500}>{user.name}</Typography>
-              <Typography variant="caption" color="text.secondary">{user.role}</Typography>
-            </Box>
-          </Box>
-        </Box>
+
       </Box>
 
-      {loading ? (
+      {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>
@@ -353,7 +235,7 @@ const Dashboard = () => {
                 <CheckCircle size={24} color="#673AB7" />
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {stats.popularWorkshop.title}
+                    {stats.popularWorkshop.title || "N/A"}
                   </Typography>
                   <Typography variant="body2">
                     {stats.popularWorkshop.bookings} bookings
@@ -415,7 +297,6 @@ const Dashboard = () => {
                       label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                     >
                       {workshopData.map((_entry, index) => (
-
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -460,7 +341,7 @@ const Dashboard = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {recentBookings.map((booking) => (
+                  {recentBookings.map((booking: Booking) => (
                     <TableRow key={booking.id}>
                       <TableCell>
                         <Typography fontWeight={500}>{booking.customer.name}</Typography>
@@ -530,7 +411,7 @@ const Dashboard = () => {
               </Box>
             </Box>
             <Box sx={{ p: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>
-              {upcomingWorkshops.map((workshop) => (
+              {upcomingWorkshops.map((workshop: Workshop) => (
                 <Paper key={workshop.id} elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                     <Typography variant="h6">{workshop.title}</Typography>
@@ -576,4 +457,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard; 

@@ -40,8 +40,9 @@ const Login: React.FC = () => {
       }
     }
     if (isSuccess) {
-      const message = "User Registered Successfully";
+      const message = "Admin Logedin Successfully";
       dispatch(setCredentials(data));
+
       toast.success(message);
 
     }
