@@ -20,7 +20,7 @@ export const bookingApiSlice = apiSlice.injectEndpoints({
         url: `bookings/${bookingId}/cancel`,
         method: 'PATCH'
       }),
-      invalidatesTags: ['Bookings', 'Workshops']
+      invalidatesTags: ['Bookings']
     }),
 
     // Admin endpoints
@@ -34,7 +34,7 @@ getAllBookings: builder.query({
 
     updateBookingStatus: builder.mutation({
       query: ({ bookingId, status }) => ({
-        url: `bookings/${bookingId}`,
+        url: `bookings/${bookingId}/update`,
         method: 'PATCH',
         body: { status }
       }),

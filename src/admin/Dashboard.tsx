@@ -399,15 +399,7 @@ const Dashboard = () => {
                 >
                   View All
                 </Button>
-                <Button
-                  component={Link}
-                  to="/admin/workshops/create"
-                  variant="contained"
-                  size="small"
-                  startIcon={<Plus size={16} />}
-                >
-                  New Workshop
-                </Button>
+
               </Box>
             </Box>
             <Box sx={{ p: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>

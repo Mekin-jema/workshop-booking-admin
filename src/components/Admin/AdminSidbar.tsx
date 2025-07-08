@@ -85,6 +85,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         top: 0,
         display: "flex",
       }}
+
+      className="relative"
     >
       <ProSidebar
         collapsed={isCollapsed}
@@ -177,7 +179,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
           </Box>
 
           {/* Logout Button */}
-          <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
+          <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }} className="absolute bottom-0 w-full justify-center items-center">
             <Button
               fullWidth
               onClick={() => {
