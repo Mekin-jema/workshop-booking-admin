@@ -56,9 +56,14 @@ const Signup: React.FC = () => {
 
   const onSubmit = async (data: SignUpFormValues) => {
     const { confirmPassword, ...userData } = data;
+
     try {
       setPending(true);
-      await register(userData).unwrap();
+
+      // Add role here
+      const userWithRole = { ...userData, role: "ADMIN" };
+
+      await register(userWithRole).unwrap();
       toast.success("Signup successful!");
       reset();
       navigate("/login");
@@ -68,6 +73,8 @@ const Signup: React.FC = () => {
       setPending(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

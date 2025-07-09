@@ -11,20 +11,15 @@ import {
   TableHead,
   TableRow,
   Chip,
-  IconButton,
-  Tooltip,
   CircularProgress
 } from "@mui/material";
 import {
-  Bell,
   Calendar,
   Users,
   Clock,
   AlertCircle,
   CheckCircle,
   XCircle,
-  RefreshCw,
-  Plus
 } from "lucide-react";
 import {
   LineChart,
@@ -52,14 +47,14 @@ const Dashboard = () => {
     data: workshopsData = [],
     isLoading: isWorkshopsLoading,
     // isError: isWorkshopsError,
-    refetch: refetchWorkshops
+    // refetch: refetchWorkshops
   } = useGetWorkshopsQuery({}, { refetchOnMountOrArgChange: true });
 
   const {
     data: bookingsData = { data: [], meta: { total: 0 } },
     isLoading: isBookingsLoading,
     // isError: isBookingsError,
-    refetch: refetchBookings
+    // refetch: refetchBookings
   } = useGetAllBookingsQuery({}, { refetchOnMountOrArgChange: true });
 
   const [stats, setStats] = useState({
@@ -73,11 +68,7 @@ const Dashboard = () => {
   const [recentBookings, setRecentBookings] = useState([]);
   const [upcomingWorkshops, setUpcomingWorkshops] = useState([]);
 
-  const user = {
-    name: "Admin User",
-    role: "ADMIN",
-    avatar: "https://i.pravatar.cc/150?img=3",
-  };
+
 
   // Calculate statistics when data changes
   useEffect(() => {
@@ -121,10 +112,10 @@ const Dashboard = () => {
     }
   }, [bookingsData, workshopsData]);
 
-  const handleRefresh = () => {
-    refetchWorkshops();
-    refetchBookings();
-  };
+  // const handleRefresh = () => {
+  //   refetchWorkshops();
+  //   refetchBookings();
+  // };
 
   const getStatusChip = (status: string): React.ReactNode => {
     switch (status) {
@@ -337,7 +328,6 @@ const Dashboard = () => {
                     <TableCell>Workshop</TableCell>
                     <TableCell>Date/Time</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -361,15 +351,7 @@ const Dashboard = () => {
                       <TableCell>
                         {getStatusChip(booking.status)}
                       </TableCell>
-                      <TableCell>
-                        <Button
-                          size="small"
-                          component={Link}
-                          to={`/admin/bookings/${booking.id}`}
-                        >
-                          Manage
-                        </Button>
-                      </TableCell>
+
                     </TableRow>
                   ))}
                 </TableBody>
