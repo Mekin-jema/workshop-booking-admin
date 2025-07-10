@@ -37,20 +37,21 @@ const Item = ({ title, to, icon, setSelected, pathname, isCollapsed }: ItemProps
 
   return (
     <MenuItem
-      icon={icon}
+      icon={<Box sx={{ fontSize: 18 }}>{icon}</Box>}
       component={<Link to={to} />}
       onClick={() => setSelected(to)}
       active={isActive}
       style={{
         color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
         backgroundColor: isActive ? theme.palette.action.selected : "transparent",
-        margin: "4px 8px",
-        borderRadius: "8px",
+        margin: "2px 4px",
+        borderRadius: "6px",
         transition: "all 0.3s ease",
+        padding: "4px 8px",
       }}
     >
       {!isCollapsed && (
-        <Typography variant="body2" fontWeight={isActive ? 600 : 400}>
+        <Typography variant="caption" fontWeight={isActive ? 600 : 400} noWrap>
           {title}
         </Typography>
       )}
@@ -85,7 +86,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         top: 0,
         display: "flex",
       }}
-
       className="relative"
     >
       <ProSidebar
@@ -109,8 +109,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               justifyContent: isCollapsed ? "center" : "flex-start",
               alignItems: "center",
               flexDirection: isCollapsed ? "column" : "row",
-              padding: isCollapsed ? "8px 0" : "8px 16px",
-              textAlign: "center",
+              padding: isCollapsed ? "6px 0" : "6px 12px",
+              gap: isCollapsed ? "0px" : "8px",
+              fontSize: "0.75rem",
               [`&.active`]: {
                 backgroundColor: theme.palette.action.selected,
                 color: theme.palette.primary.main,
@@ -122,16 +123,16 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
             }),
           }}
         >
-          {/* User Profile Header */}
-          <Box sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Avatar alt={user?.name} sx={{ width: 40, height: 40 }} />
+          {/* User Profile */}
+          <Box sx={{ p: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Avatar alt={user?.name} sx={{ width: 32, height: 32 }} />
               {!isCollapsed && (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={600}>
+                  <Typography variant="body2" fontWeight={600} noWrap>
                     {user?.name}
                   </Typography>
-                  <Typography variant="caption" color="textSecondary">
+                  <Typography variant="caption" color="textSecondary" noWrap>
                     {user?.role}
                   </Typography>
                 </Box>
@@ -139,7 +140,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
             </Stack>
           </Box>
 
-          {/* Collapse Toggle Button */}
+          {/* Collapse Toggle */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={
@@ -155,11 +156,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
                 {isCollapsed ? <Icons.chevronRight /> : <Icons.chevronLeft />}
               </IconButton>
             }
-            style={{ margin: "16px 0 24px 0", padding: "0 16px" }}
+            style={{ margin: "12px 0 16px 0", padding: "0 8px" }}
           >
             {!isCollapsed && (
               <Typography
-                variant="h6"
+                variant="subtitle2"
                 fontWeight={700}
                 sx={{ color: theme.palette.primary.main, ml: 1 }}
               >
@@ -168,7 +169,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
             )}
           </MenuItem>
 
-          {/* Navigation Items */}
+          {/* Menu Items */}
           <Box sx={{ px: isCollapsed ? 0 : 1 }}>
             <Item title="Dashboard" to="/admin" icon={<Icons.dashboard />} selected={selected} setSelected={setSelected} pathname={location.pathname} isCollapsed={isCollapsed} />
             <Item title="All Workshops" to="/admin/workshops" icon={<Icons.workshops />} selected={selected} setSelected={setSelected} pathname={location.pathname} isCollapsed={isCollapsed} />
@@ -178,8 +179,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
             <Item title="Booking Analytics" to="/admin/analytics/bookings" icon={<Icons.analytics />} selected={selected} setSelected={setSelected} pathname={location.pathname} isCollapsed={isCollapsed} />
           </Box>
 
-          {/* Logout Button */}
-          <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }} className="absolute bottom-0 w-full justify-center items-center">
+          {/* Logout */}
+          <Box
+            sx={{
+              p: 1.5,
+              borderTop: `1px solid ${theme.palette.divider}`,
+            }}
+            className="absolute bottom-0 w-full justify-center items-center"
+          >
             <Button
               fullWidth
               onClick={() => {
@@ -189,6 +196,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               sx={{
                 justifyContent: isCollapsed ? "center" : "flex-start",
                 minWidth: "auto",
+                fontSize: "0.75rem",
                 color: theme.palette.text.secondary,
                 "&:hover": {
                   color: theme.palette.error.main,
@@ -197,11 +205,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               }}
             >
               {isCollapsed ? (
-                <LogOut />
+                <LogOut size={18} />
               ) : (
                 <>
-                  <LogOut />
-                  <Typography variant="body2" ml={1}>Logout</Typography>
+                  <LogOut size={18} />
+                  <Typography variant="caption" ml={1}>
+                    Logout
+                  </Typography>
                 </>
               )}
             </Button>
