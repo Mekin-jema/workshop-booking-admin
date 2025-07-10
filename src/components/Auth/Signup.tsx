@@ -61,9 +61,8 @@ const Signup: React.FC = () => {
       setPending(true);
 
       // Add role here
-      const userWithRole = { ...userData, role: "ADMIN" };
 
-      await register(userWithRole).unwrap();
+      await register(userData).unwrap();
       toast.success("Signup successful!");
       reset();
       navigate("/login");
