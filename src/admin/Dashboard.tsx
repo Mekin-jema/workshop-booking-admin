@@ -417,7 +417,7 @@ const Dashboard = () => {
                     fullWidth
                     variant="contained"
                     component={Link}
-                    to={`/admin/workshops/${workshop.id}`}
+                    to={`/admin/workshops`}
                   >
                     Manage Workshop
                   </Button>

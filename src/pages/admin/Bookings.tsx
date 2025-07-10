@@ -243,13 +243,7 @@ const AdminBookings: React.FC = () => {
         >
           <XCircle size={18} style={{ marginRight: 8, color: 'red' }} /> Cancel
         </MenuItem>
-        <MenuItem
-          component={Link}
-          to={`/admin/bookings/${selectedBooking?.id}`}
-          onClick={handleMenuClose}
-        >
-          <Eye size={18} style={{ marginRight: 8, color: 'blue' }} /> View Details
-        </MenuItem>
+
       </Menu>
 
       <Snackbar
