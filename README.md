@@ -1,69 +1,69 @@
-# React + TypeScript + Vite
+## 🧑‍💼 Admin Usage Guide
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Admin Panel allows authorized users to manage workshops and bookings. It connects to the backend API and requires proper setup.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### ✅ Method 1: Quick Start (Recommended)
 
-## Expanding the ESLint configuration
+1. First, make sure the **backend** and **Docker environment** are up and running.  
+   Follow [Setup Instructions](https://github.com/Mekin-jema/workshop-booking-backend) from the backend.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. Open the admin panel in your browser:  
+   👉 [https://workshop-booking-admin.vercel.app/](https://workshop-booking-admin.vercel.app/)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. This admin panel is **private** — only known users should access it.  
+   You must **register yourself as an admin**.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+4. After registering, log in and begin managing:
+   - 🔧 Workshops
+   - 📋 Bookings
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+> ⚠️ Keep this URL confidential for security.
+
+---
+
+### 🛠️ Method 2: Local Setup (From Scratch)
+
+If you want to run the admin panel locally:
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Mekin-jema/workshop-booking-admin.git
+cd workshop-booking-admin
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+#### 2. Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+#### 3. Add Environment Variables
+
+Create a `.env.local` file in the project root with the following:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+```
+
+
+#### 4. Run the Dev Server
+
+```bash
+npm run dev
+```
+
+> 🔗 Visit the app at: [http://localhost:3000](http://localhost:3000)  
+> Log in as an admin and begin managing the system.
+
+---
+
+### 🛡️ What Can Admins Do?
+
+- 📅 Create, update, and delete workshops
+- 🕐 Manage time slots and availability
+- 📦 View and manage bookings
+
+
